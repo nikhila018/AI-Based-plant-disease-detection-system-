@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant Disease Detection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9fdf9;
+      color: #333;
+    }
+    header {
+      background: #2e7d32;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      color: #b9f6ca;
+    }
+    .logout-btn {
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 15px;
+      font-size: 15px;
+      margin-left: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover {
+      background: #c62828;
+    }
+
+    .hero {
+      min-height: 480px;
+      width: 100vw;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 100px 20px;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.25)),
+        url("{{ url_for('static', filename='background.jpg') }}") no-repeat center center;
+      background-size: cover;
+      background-position: center center;
+    }
+    .hero h2 {
+      font-size: 40px;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.38);
+    }
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.38);
+    }
+    .hero button {
+      background: #66bb6a;
+      color: white;
+      padding: 15px 25px;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.2s;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .hero button:hover {
+      background: #388e3c;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      text-align: center;
+    }
+    .feature {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .upload-section {
+      text-align: center;
+      padding: 50px 20px;
+      background-size: cover;
+      border-radius: 15px;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+    .upload-box {
+      border: 2px dashed #2e7d32;
+      border-radius: 10px;
+      padding: 40px;
+      margin: 20px auto;
+      max-width: 400px;
+      background: #fff;
+    }
+    .upload-box input {
+      display: none;
+    }
+    .upload-box label {
+      display: block;
+      padding: 15px;
+      background: #66bb6a;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .result {
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .result h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+    footer {
+      background: #2e7d32;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>🌿 PlantHealth AI</h1>
+    <nav>
+      <a href="{{ url_for('landing') }}">Home</a>
+      <a href="#upload">Upload</a>
+      <a href="#result">Results</a>
+      <a href="#about">About</a>
+      <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
+    </nav>
+  </header>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Detect Plant Diseases Instantly</h2>
+    <p>Upload a leaf image and let AI predict the disease with treatment suggestions.</p>
+    <button onclick="document.getElementById('fileInput').click()">Upload Now</button>
+  </section>
+  <!-- Features -->
+  <section class="features">
+    <div class="feature">⚡ Fast Detection</div>
+    <div class="feature">📷 Easy Upload</div>
+    <div class="feature">🤖 AI Powered</div>
+    <div class="feature">💡 Treatment Tips</div>
+  </section>
+  <!-- Upload Section -->
+  <section id="upload" class="upload-section">
+    <h2>Upload Plant Leaf Image</h2>
+    <div class="upload-box">
+      <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
+      <label for="fileInput">Choose Image</label>
+      <img id="preview" src="" alt="Preview" style="max-width:100%; margin-top:20px; display:none;">
+    </div>
+    <button id="detectBtn" style="background:#2e7d32; color:white; padding:12px 20px; border:none; border-radius:5px; cursor:pointer;">Detect Disease</button>
+  </section>
+  <!-- Result Section -->
+  <section id="result" class="result" style="display:none;">
+    <h3>Prediction Result</h3>
+    <p id="predictionText">Processing...</p>
+  </section>
+  <!-- Footer -->
+  <footer id="about">
+    <p>🌱 PlantHealth AI | Educational Tool for Farmers</p>
+    <p>Disclaimer: This tool is for educational purposes. Please consult an expert for detailed treatment.</p>
+  </footer>
+  <!-- JavaScript -->
+  <script>
+    function previewImage(event) {
+      const preview = document.getElementById('preview');
+      preview.src = URL.createObjectURL(event.target.files[0]);
+      preview.style.display = "block";
+    }
+    document.getElementById("detectBtn").addEventListener("click", async () => {
+      const fileInput = document.getElementById("fileInput");
+      if (fileInput.files.length === 0) {
+        alert("Please select an image first!");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      // Call Flask backend
+      const response = await fetch("/predict", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+      document.getElementById("result").style.display = "block";
+      document.getElementById("predictionText").innerHTML =
+        `<b>Plant:</b> Leaf <br>
+         <b>Disease:</b> ${data.prediction} <br>
+         <b>Confidence:</b> ${Math.round(data.confidence * 100)}%`;
+    });
+  </script>
+</body>
+</html>
